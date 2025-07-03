@@ -3,8 +3,6 @@ import 'dotenv/config'
 
 const uri = process.env.DB_URI as string
 
-console.log(process.env.DB_URI)
-
 class DatabaseService {
   private client: MongoClient
   constructor() {
