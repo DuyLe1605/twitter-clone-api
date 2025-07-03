@@ -1,7 +1,11 @@
-const printInformation = ({ name, age }: { name: string; age: number }) => {
-  console.log(`Hello ${name}, ${age} years old`)
-}
+import express from 'express'
+import userRouter from '~/routes/users.routes'
+const app = express()
 
-const Lee = { name: 'Duy Lee', age: 20 }
-const { name, age } = Lee
-printInformation({ name, age })
+const port = 4000
+app.use(express.json())
+app.use('/user', userRouter)
+
+app.listen(port, () => {
+  console.log(`Example app listening on port ${port}`)
+})
