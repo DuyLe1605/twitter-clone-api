@@ -1,13 +1,14 @@
 import { Router } from 'express'
-import { loginController } from '~/controllers/users.controller'
+import { loginController, registerController } from '~/controllers/users.controller'
 import { loginValidator } from '~/middlewares/users.middleware'
 
-const userRouter = Router()
+const usersRouter = Router()
 
-userRouter.get('/', (req, res) => {
+usersRouter.get('/', (req, res) => {
   res.send('Home page')
 })
 // define the about route
-userRouter.post('/login', loginValidator, loginController)
+usersRouter.post('/login', loginValidator, loginController)
+usersRouter.post('/register', loginValidator, registerController)
 
-export default userRouter
+export default usersRouter
