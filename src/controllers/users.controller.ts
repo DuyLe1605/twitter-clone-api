@@ -1,12 +1,12 @@
 import { Response, Request } from 'express'
+import { UserReqBody } from '~/models/requests/User.request'
 import usersService from '~/services/users.service'
 
 export const registerController = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body
-    const result = await usersService.register({ email, password })
+    const result = await usersService.register(req.body as UserReqBody)
     res.json({
-      message: 'Dang ki thanh cong',
+      message: 'Đăng kí thành công !',
       result
     })
   } catch (error: any) {
