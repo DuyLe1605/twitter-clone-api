@@ -6,6 +6,10 @@ class UsersService {
     const result = await databaseService.users.insertOne(new User({ email, password }))
     return result
   }
+  async checkEmailExist(email: string) {
+    const result = await databaseService.users.findOne({ email })
+    return Boolean(result)
+  }
 }
 
 const usersService = new UsersService()

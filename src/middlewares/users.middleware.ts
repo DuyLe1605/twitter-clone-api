@@ -1,5 +1,6 @@
 import { NextFunction, Response, Request } from 'express'
 import { checkSchema } from 'express-validator'
+import usersService from '~/services/users.service'
 
 export const registerValidator = checkSchema({
   name: {
@@ -14,7 +15,16 @@ export const registerValidator = checkSchema({
   email: {
     trim: true,
     notEmpty: { errorMessage: 'Không được để trống Email' },
-    isEmail: { errorMessage: 'Email không đúng định dạng' }
+    isEmail: { errorMessage: 'Email không đúng định dạng' },
+    custom: {
+      options: async (value) => {
+        // Không cần try catch, cứ throw lỗi nếu sai vì hàm validate đã xử lí nó rồi
+        const exist = await usersService.checkEmailExist(value)
+        if (exist) throw new Error('Email đã tồn tại !')
+
+        return value
+      }
+    }
   },
   password: {
     trim: true,
