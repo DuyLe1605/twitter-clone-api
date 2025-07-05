@@ -1,6 +1,6 @@
-import { Collection, Db, MongoClient, MongoError, ServerApiVersion } from 'mongodb'
+import { Collection, Db, MongoClient, ServerApiVersion } from 'mongodb'
 import 'dotenv/config'
-import { UserInterface } from '~/models/schemas/user.schema'
+import { UserInterface } from '~/models/schemas/User.schema'
 
 const uri = process.env.DB_URI as string
 
@@ -26,7 +26,7 @@ class DatabaseService {
       console.log('Pinged your deployment. You successfully connected to MongoDB!')
     } catch (error: any) {
       console.dir(error.message)
-      this.close()
+      throw error
     }
   }
 
