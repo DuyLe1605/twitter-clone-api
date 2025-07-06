@@ -31,7 +31,7 @@ const validate = (validations: RunnableValidationChains<ValidationChain>) => {
       }
     }
 
-    // Nếu chỉ có lỗi 422 thì trả về Entity Erorr
+    // Nếu chỉ có lỗi 422 thì trả về Entity Error
     const entityErrors = new EntityError({ errors: errorObjects })
     next(entityErrors)
   }

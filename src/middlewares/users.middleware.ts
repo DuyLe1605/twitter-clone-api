@@ -1,26 +1,27 @@
 import { NextFunction, Response, Request } from 'express'
 import { checkSchema } from 'express-validator'
+import { USERS_MESSAGES } from '~/constants/messages'
 import usersService from '~/services/users.service'
 
 export const registerValidator = checkSchema({
   name: {
     trim: true,
-    notEmpty: { errorMessage: 'Không được để trống Tên' },
+    notEmpty: { errorMessage: USERS_MESSAGES.NAME_IS_REQUIRED },
 
     isLength: {
       options: { min: 1, max: 100 },
-      errorMessage: 'Tên phải nằm trong khoảng 1-100 kí tự'
+      errorMessage: USERS_MESSAGES.NAME_LENGTH
     }
   },
   email: {
     trim: true,
-    notEmpty: { errorMessage: 'Không được để trống Email' },
-    isEmail: { errorMessage: 'Email không đúng định dạng' },
+    notEmpty: { errorMessage: USERS_MESSAGES.EMAIL_IS_REQUIRED },
+    isEmail: { errorMessage: USERS_MESSAGES.EMAIL_IS_INVALID },
     custom: {
       options: async (value) => {
         // Không cần try catch, cứ throw lỗi nếu sai vì hàm validate đã xử lí nó rồi
         const exist = await usersService.checkEmailExist(value)
-        if (exist) throw new Error('Email đã tồn tại !')
+        if (exist) throw new Error(USERS_MESSAGES.EMAIL_ALREADY_EXISTS)
 
         return value
       }
@@ -28,37 +29,40 @@ export const registerValidator = checkSchema({
   },
   password: {
     trim: true,
-    notEmpty: { errorMessage: 'Không được để trống Password' },
+    notEmpty: { errorMessage: USERS_MESSAGES.PASSWORD_IS_REQUIRED },
     isLength: {
       options: { min: 6, max: 100 },
-      errorMessage: 'Mật khẩu phải nằm trong khoảng 6-100 kí tự'
+      errorMessage: USERS_MESSAGES.PASSWORD_LENGTH
     },
     isStrongPassword: {
       options: { minLength: 6, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1 },
-      errorMessage: 'Mật khẩu phải chứa ít nhất 1 chữ thường, 1 chữ hoa, 1 chữ số và 1 kí tự đặc biệt'
+      errorMessage: USERS_MESSAGES.PASSWORD_STRENGTH
     }
   },
   confirm_password: {
     trim: true,
-    notEmpty: { errorMessage: 'Không được để trống Confirm password' },
-    // isLength: {
-    //   options: { min: 6, max: 100 },
-    //   errorMessage: 'Mật khẩu phải nằm trong khoảng 6-100 kí tự'
-    // },
-    // isStrongPassword: {
-    //   options: { minLength: 6, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1 },
-    //   errorMessage: 'Mật khẩu phải chứa ít nhất 1 chữ thường, 1 chữ hoa, 1 chữ số và 1 kí tự đặc biệt'
-    // }
+    notEmpty: { errorMessage: USERS_MESSAGES.CONFIRM_PASSWORD_IS_REQUIRED },
     custom: {
       options: (value, { req }) => {
-        if (value !== req.body.password) throw new Error('Mật khẩu nhập lại chưa chính xác')
+        if (value !== req.body.password) throw new Error(USERS_MESSAGES.CONFIRM_PASSWORD_NOT_MATCH)
         return value
       }
+    },
+    isLength: {
+      options: { min: 6, max: 100 },
+      errorMessage: USERS_MESSAGES.CONFIRM_PASSWORD_LENGTH
+    },
+    isStrongPassword: {
+      options: { minLength: 6, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1 },
+      errorMessage: USERS_MESSAGES.CONFIRM_PASSWORD_STRENGTH
     }
   },
   date_of_birth: {
-    notEmpty: { errorMessage: 'Không được để trống ngày sinh' },
-    isISO8601: { options: { strict: true, strictSeparator: true }, errorMessage: 'Ngày sinh không hợp lệ' }
+    notEmpty: { errorMessage: USERS_MESSAGES.DATE_OF_BIRTH_IS_REQUIRED },
+    isISO8601: {
+      options: { strict: true, strictSeparator: true },
+      errorMessage: USERS_MESSAGES.DATE_OF_BIRTH_IS_INVALID
+    }
   }
 })
 
