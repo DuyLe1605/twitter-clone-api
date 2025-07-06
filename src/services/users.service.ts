@@ -8,7 +8,6 @@ import type { StringValue } from 'ms'
 
 class UsersService {
   async register(payload: UserReqBody) {
-    console.log(payload)
     const result = await databaseService.users.insertOne(
       // Không nên lưu trực tiếp mật khẩu người dùng vào vì sẽ vi phạm quyển riêng tư
       // Và nếu mà bị lộ database thì cũng tránh nguy hiểm
@@ -21,6 +20,7 @@ class UsersService {
       this.signAccessToken(user_id),
       this.signRefreshToken(user_id)
     ])
+
     return {
       access_token,
       refresh_token

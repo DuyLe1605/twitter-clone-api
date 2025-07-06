@@ -11,8 +11,10 @@ const validate = (validations: RunnableValidationChains<ValidationChain>) => {
     await validations.run(req)
 
     const errors = validationResult(req)
+
     if (errors.isEmpty()) {
       next()
+      return
     }
 
     // Nếu 1 field có nhiều lỗi, errors.mapped() sẽ trả về 1 lỗi duy nhất,
@@ -28,12 +30,14 @@ const validate = (validations: RunnableValidationChains<ValidationChain>) => {
         msg.status !== HTTP_STATUS.UNPROCESSABLE_ENTITY //422
       ) {
         next(errorObjects[key].msg)
+        return
       }
     }
 
     // Nếu chỉ có lỗi 422 thì trả về Entity Error
     const entityErrors = new EntityError({ errors: errorObjects })
     next(entityErrors)
+    return
   }
 }
 
