@@ -9,6 +9,7 @@ export const registerController = async (req: Request, res: Response, next: Next
       message: 'Đăng kí thành công !',
       result
     })
+    return
   } catch (error: any) {
     next(error)
   }
