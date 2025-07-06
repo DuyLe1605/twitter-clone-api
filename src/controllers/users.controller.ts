@@ -1,8 +1,8 @@
-import { Response, Request } from 'express'
+import { Response, Request, NextFunction } from 'express'
 import { UserReqBody } from '~/models/requests/User.request'
 import usersService from '~/services/users.service'
 
-export const registerController = async (req: Request, res: Response) => {
+export const registerController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await usersService.register(req.body as UserReqBody)
     res.json({
@@ -10,8 +10,7 @@ export const registerController = async (req: Request, res: Response) => {
       result
     })
   } catch (error: any) {
-    res.status(400).json({ message: error.message })
-    return
+    next(error)
   }
 }
 
