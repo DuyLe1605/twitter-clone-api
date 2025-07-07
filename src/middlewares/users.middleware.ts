@@ -77,8 +77,9 @@ export const loginValidator = checkSchema({
       options: async (value, { req }) => {
         const user = await databaseService.users.findOne({ email: value, password: hashPassword(req.body.password) })
         // Nếu không tìm thầy email trong data base thì trả về lỗi
+        console.log(user)
         if (!user) throw new Error(USERS_MESSAGES.USER_NOT_FOUND)
-
+        console.log('pass')
         req.user = user
         return true
       }

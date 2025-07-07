@@ -18,7 +18,7 @@ export const loginController = async (req: Request, res: Response) => {
   }
   const { _id } = user
 
-  const result = await usersService.login(_id)
+  const result = await usersService.login(_id.toString())
 
   res.json({
     message: 'Đăng nhập thành công',
