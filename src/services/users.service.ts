@@ -5,6 +5,8 @@ import databaseService from '~/services/database.service'
 import { hashPassword } from '~/utils/crypto'
 import { signToken } from '~/utils/jwt'
 import type { StringValue } from 'ms'
+import { ErrorWithStatus } from '~/models/Errors'
+import { USERS_MESSAGES } from '~/constants/messages'
 
 class UsersService {
   async register(payload: UserReqBody) {
@@ -26,23 +28,39 @@ class UsersService {
       refresh_token
     }
   }
+
+  async login(user_id: string) {
+    const [access_token, refresh_token] = await this.signAccessAndRefreshToken(user_id)
+
+    return {
+      access_token,
+      refresh_token
+    }
+  }
+
   async checkEmailExist(email: string) {
     const result = await databaseService.users.findOne({ email })
     return Boolean(result)
   }
+
+  // Token
   private signAccessToken(user_id: string) {
     return signToken({
-      type: 'accessToken',
+      type: TokenType.AccessToken,
       payload: { user_id, token_type: TokenType.AccessToken },
       options: { algorithm: 'HS256', expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN as StringValue }
     })
   }
+
   private signRefreshToken(user_id: string) {
     return signToken({
-      type: 'refreshToken',
+      type: TokenType.RefreshToken,
       payload: { user_id, token_type: TokenType.RefreshToken },
       options: { algorithm: 'HS256', expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN as StringValue }
     })
+  }
+  private signAccessAndRefreshToken(user_id: string) {
+    return Promise.all([this.signAccessToken(user_id), this.signRefreshToken(user_id)])
   }
 }
 

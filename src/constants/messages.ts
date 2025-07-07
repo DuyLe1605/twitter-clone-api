@@ -22,5 +22,8 @@ export const USERS_MESSAGES = {
 
   // Ngày sinh
   DATE_OF_BIRTH_IS_REQUIRED: 'Vui lòng nhập Ngày sinh',
-  DATE_OF_BIRTH_IS_INVALID: 'Ngày sinh không hợp lệ'
+  DATE_OF_BIRTH_IS_INVALID: 'Ngày sinh không hợp lệ',
+
+  // Tìm email khi đăng nhập,
+  USER_NOT_FOUND: 'Email hoặc mật khẩu không chính xác'
 } as const

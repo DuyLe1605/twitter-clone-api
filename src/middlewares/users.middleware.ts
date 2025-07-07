@@ -1,7 +1,9 @@
 import { NextFunction, Response, Request } from 'express'
 import { checkSchema } from 'express-validator'
 import { USERS_MESSAGES } from '~/constants/messages'
+import databaseService from '~/services/database.service'
 import usersService from '~/services/users.service'
+import { hashPassword } from '~/utils/crypto'
 
 export const registerValidator = checkSchema({
   name: {
@@ -66,11 +68,32 @@ export const registerValidator = checkSchema({
   }
 })
 
-export const loginValidator = (req: Request, res: Response, next: NextFunction) => {
-  const { email, password } = req.body
-  if (!email || !password) {
-    res.status(400).json({ message: 'Thiếu Email hoặc password' })
-    return
+export const loginValidator = checkSchema({
+  email: {
+    trim: true,
+    notEmpty: { errorMessage: USERS_MESSAGES.EMAIL_IS_REQUIRED },
+    isEmail: { errorMessage: USERS_MESSAGES.EMAIL_IS_INVALID },
+    custom: {
+      options: async (value, { req }) => {
+        const user = await databaseService.users.findOne({ email: value, password: hashPassword(req.body.password) })
+        // Nếu không tìm thầy email trong data base thì trả về lỗi
+        if (!user) throw new Error(USERS_MESSAGES.USER_NOT_FOUND)
+
+        req.user = user
+        return true
+      }
+    }
+  },
+  password: {
+    trim: true,
+    notEmpty: { errorMessage: USERS_MESSAGES.PASSWORD_IS_REQUIRED },
+    isLength: {
+      options: { min: 6, max: 100 },
+      errorMessage: USERS_MESSAGES.PASSWORD_LENGTH
+    },
+    isStrongPassword: {
+      options: { minLength: 6, minLowercase: 1, minUppercase: 1, minNumbers: 1, minSymbols: 1 },
+      errorMessage: USERS_MESSAGES.PASSWORD_STRENGTH
+    }
   }
-  next()
-}
+})
