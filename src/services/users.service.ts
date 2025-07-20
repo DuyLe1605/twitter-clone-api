@@ -5,8 +5,9 @@ import databaseService from '~/services/database.service'
 import { hashPassword } from '~/utils/crypto'
 import { signToken } from '~/utils/jwt'
 import type { StringValue } from 'ms'
-import RefreshToken, { RefreshTokenInterface } from '~/models/schemas/RefreshToken.schema'
+import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import { ObjectId } from 'mongodb'
+import 'dotenv/config'
 
 class UsersService {
   async register(payload: UserReqBody) {
@@ -51,7 +52,7 @@ class UsersService {
   // Token
   private signAccessToken(user_id: string) {
     return signToken({
-      type: TokenType.AccessToken,
+      privateKey: process.env.SIGN_ACCESS_TOKEN_SECRET_KEY as string,
       payload: { user_id, token_type: TokenType.AccessToken },
       options: { algorithm: 'HS256', expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN as StringValue }
     })
@@ -59,7 +60,7 @@ class UsersService {
 
   private signRefreshToken(user_id: string) {
     return signToken({
-      type: TokenType.RefreshToken,
+      privateKey: process.env.SIGN_REFRESH_TOKEN_SECRET_KEY as string,
       payload: { user_id, token_type: TokenType.RefreshToken },
       options: { algorithm: 'HS256', expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN as StringValue }
     })
