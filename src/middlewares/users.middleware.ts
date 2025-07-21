@@ -7,6 +7,9 @@ import usersService from '~/services/users.service'
 import { hashPassword } from '~/utils/crypto'
 import { verifyToken } from '~/utils/jwt'
 import 'dotenv/config'
+import { capitalize } from 'lodash'
+import { JsonWebTokenError } from 'jsonwebtoken'
+import { Request } from 'express'
 
 export const registerValidator = checkSchema(
   {
@@ -124,29 +127,76 @@ export const accessTokenValidator = checkSchema(
   {
     Authorization: {
       notEmpty: {
-        errorMessage: 'AccessToken là bắt buộc'
+        errorMessage: USERS_MESSAGES.ACCESS_TOKEN_IS_REQUIRED
       },
       custom: {
         options: async (value, { req }) => {
           const access_token = value.split('Bearer ')[1]
-          console.log('acctoken', access_token)
+
           if (!access_token) {
             throw new ErrorWithStatus({
               message: USERS_MESSAGES.VALIDATION_ERROR,
               status: HTTP_STATUS.UNAUTHORIZED
             })
           }
-          const decoded_token = await verifyToken({
-            token: access_token,
-            secretOrPublicKey: process.env.SIGN_ACCESS_TOKEN_SECRET_KEY as string
-          })
 
-          console.log('decoded_token', decoded_token)
-          req.decoded_authorization = decoded_token
+          try {
+            const decoded_token = await verifyToken({
+              token: access_token,
+              secretOrPublicKey: process.env.SIGN_ACCESS_TOKEN_SECRET_KEY as string
+            })
+
+            ;(req as Request).decoded_authorization = decoded_token
+          } catch (error) {
+            throw new ErrorWithStatus({
+              message: capitalize((error as JsonWebTokenError).message),
+              status: HTTP_STATUS.UNAUTHORIZED
+            })
+          }
           return true
         }
       }
     }
   },
   ['headers']
+)
+
+export const refreshTokenValidator = checkSchema(
+  {
+    refresh_token: {
+      notEmpty: {
+        errorMessage: USERS_MESSAGES.REFRESH_TOKEN_IS_REQUIRED
+      },
+      custom: {
+        options: async (value, { req }) => {
+          try {
+            console.log(value)
+            const [decoded_refresh_token, refresh_token] = await Promise.all([
+              verifyToken({ token: value, secretOrPublicKey: process.env.SIGN_REFRESH_TOKEN_SECRET_KEY as string }),
+              databaseService.refreshTokens.findOne({ token: value })
+            ])
+
+            if (refresh_token === null) {
+              throw new ErrorWithStatus({
+                message: USERS_MESSAGES.REFRESH_TOKEN_IS_NOT_EXIST,
+                status: HTTP_STATUS.UNAUTHORIZED
+              })
+            }
+
+            ;(req as Request).decoded_refresh_token = decoded_refresh_token
+          } catch (error) {
+            if (error instanceof JsonWebTokenError) {
+              throw new ErrorWithStatus({
+                message: capitalize((error as JsonWebTokenError).message),
+                status: HTTP_STATUS.UNAUTHORIZED
+              })
+            }
+            throw error
+          }
+          return true
+        }
+      }
+    }
+  },
+  ['body']
 )

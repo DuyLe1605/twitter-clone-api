@@ -1,6 +1,11 @@
 import { Router } from 'express'
-import { loginController, registerController } from '~/controllers/users.controller'
-import { accessTokenValidator, loginValidator, registerValidator } from '~/middlewares/users.middleware'
+import { loginController, logoutController, registerController } from '~/controllers/users.controller'
+import {
+  accessTokenValidator,
+  loginValidator,
+  refreshTokenValidator,
+  registerValidator
+} from '~/middlewares/users.middleware'
 import { wrapRequestHandler } from '~/utils/handlers'
 import validate from '~/utils/validation'
 
@@ -17,12 +22,8 @@ usersRouter.post('/login', validate(loginValidator), wrapRequestHandler(loginCon
 usersRouter.post(
   '/logout',
   validate(accessTokenValidator),
-  wrapRequestHandler((req, res) => {
-    res.json({
-      message: 'Logout thanh cong'
-    })
-    return
-  })
+  validate(refreshTokenValidator),
+  wrapRequestHandler(logoutController)
 )
 
 export default usersRouter

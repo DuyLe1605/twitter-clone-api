@@ -33,5 +33,8 @@ export const USERS_MESSAGES = {
   LOGIN_SUCCESS: 'Đăng nhập thành công. Chào mừng bạn quay trở lại!',
   REGISTER_SUCCESS: 'Đăng ký tài khoản thành công. Cảm ơn bạn đã lựa chọn chúng tôi!',
   LOGOUT_SUCCESS: 'Bạn đã đăng xuất khỏi hệ thống thành công.',
-  ACCESS_TOKEN_IS_REQUIRED: 'Yêu cầu xác thực: Vui lòng cung cấp mã truy cập (access token) hợp lệ.'
+
+  ACCESS_TOKEN_IS_REQUIRED: 'Yêu cầu xác thực: Vui lòng cung cấp mã truy cập (access token) hợp lệ.',
+  REFRESH_TOKEN_IS_REQUIRED: 'Yêu cầu xác thực: Vui lòng cung cấp mã truy cập (refresh token) hợp lệ.',
+  REFRESH_TOKEN_IS_NOT_EXIST: 'Refresh token không tồn tại'
 } as const

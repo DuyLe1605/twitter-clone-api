@@ -1,6 +1,6 @@
 import { Response, Request } from 'express'
 import { USERS_MESSAGES } from '~/constants/messages'
-import { UserReqBody } from '~/models/requests/User.request'
+import { LogoutReqBody, UserReqBody } from '~/models/requests/User.request'
 import usersService from '~/services/users.service'
 
 export const registerController = async (req: Request, res: Response) => {
@@ -26,4 +26,13 @@ export const loginController = async (req: Request, res: Response) => {
     result
   })
   return
+}
+
+export const logoutController = async (req: Request, res: Response) => {
+  const { refresh_token } = req.body as LogoutReqBody
+  const result = await usersService.logout(refresh_token)
+
+  res.json({
+    message: result
+  })
 }

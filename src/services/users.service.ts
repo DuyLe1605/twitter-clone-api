@@ -8,6 +8,7 @@ import type { StringValue } from 'ms'
 import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import { ObjectId } from 'mongodb'
 import 'dotenv/config'
+import { USERS_MESSAGES } from '~/constants/messages'
 
 class UsersService {
   async register(payload: UserReqBody) {
@@ -47,6 +48,13 @@ class UsersService {
   async checkEmailExist(email: string) {
     const result = await databaseService.users.findOne({ email })
     return Boolean(result)
+  }
+
+  async logout(refresh_token: string) {
+    await databaseService.refreshTokens.deleteOne({ token: refresh_token })
+    return {
+      message: USERS_MESSAGES.LOGOUT_SUCCESS
+    }
   }
 
   // Token
