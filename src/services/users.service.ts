@@ -57,8 +57,20 @@ class UsersService {
     }
   }
 
+  async refreshToken({ refresh_token, user_id, exp }: { refresh_token: string; user_id: string; exp: number }) {
+    const [new_access_token, new_refresh_token] = await Promise.all([
+      this.signAccessToken({ user_id }),
+      this.signRefreshToken({ user_id, exp }),
+      databaseService.refreshTokens.deleteOne({ token: refresh_token })
+    ])
+
+    databaseService.refreshTokens.insertOne({ user_id: new ObjectId(user_id), token: new_refresh_token })
+
+    return { access_token: new_access_token, refresh_token: new_refresh_token }
+  }
+
   // Token
-  private signAccessToken(user_id: string) {
+  private signAccessToken({ user_id }: { user_id: string }) {
     return signToken({
       privateKey: process.env.SIGN_ACCESS_TOKEN_SECRET_KEY as string,
       payload: { user_id, token_type: TokenType.AccessToken },
@@ -66,7 +78,13 @@ class UsersService {
     })
   }
 
-  private signRefreshToken(user_id: string) {
+  private signRefreshToken({ user_id, exp }: { user_id: string; exp?: number }) {
+    if (exp) {
+      return signToken({
+        privateKey: process.env.SIGN_REFRESH_TOKEN_SECRET_KEY as string,
+        payload: { user_id, token_type: TokenType.RefreshToken, exp }
+      })
+    }
     return signToken({
       privateKey: process.env.SIGN_REFRESH_TOKEN_SECRET_KEY as string,
       payload: { user_id, token_type: TokenType.RefreshToken },
@@ -74,7 +92,7 @@ class UsersService {
     })
   }
   private signAccessAndRefreshToken(user_id: string) {
-    return Promise.all([this.signAccessToken(user_id), this.signRefreshToken(user_id)])
+    return Promise.all([this.signAccessToken({ user_id }), this.signRefreshToken({ user_id })])
   }
 }
 
