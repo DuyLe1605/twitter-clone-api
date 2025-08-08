@@ -1,4 +1,4 @@
-import { checkSchema } from 'express-validator'
+import { check, checkSchema } from 'express-validator'
 import { HTTP_STATUS } from '~/constants/httpStatus'
 import { USERS_MESSAGES } from '~/constants/messages'
 import { ErrorWithStatus } from '~/models/Errors'
@@ -126,12 +126,16 @@ export const loginValidator = checkSchema(
 export const accessTokenValidator = checkSchema(
   {
     Authorization: {
-      notEmpty: {
-        errorMessage: USERS_MESSAGES.ACCESS_TOKEN_IS_REQUIRED
-      },
+      trim: true,
       custom: {
         options: async (value, { req }) => {
-          const access_token = value.split('Bearer ')[1]
+          if (!value) {
+            throw new ErrorWithStatus({
+              message: USERS_MESSAGES.ACCESS_TOKEN_IS_REQUIRED,
+              status: HTTP_STATUS.UNAUTHORIZED
+            })
+          }
+          const access_token = (value || '').split(' ')[1]
 
           if (!access_token) {
             throw new ErrorWithStatus({
@@ -164,11 +168,16 @@ export const accessTokenValidator = checkSchema(
 export const refreshTokenValidator = checkSchema(
   {
     refresh_token: {
-      notEmpty: {
-        errorMessage: USERS_MESSAGES.REFRESH_TOKEN_IS_REQUIRED
-      },
+      trim: true,
       custom: {
         options: async (value, { req }) => {
+          if (!value) {
+            throw new ErrorWithStatus({
+              message: USERS_MESSAGES.REFRESH_TOKEN_IS_REQUIRED,
+              status: HTTP_STATUS.UNAUTHORIZED
+            })
+          }
+
           try {
             console.log(value)
             const [decoded_refresh_token, refresh_token] = await Promise.all([
@@ -194,6 +203,38 @@ export const refreshTokenValidator = checkSchema(
             throw error
           }
           return true
+        }
+      }
+    }
+  },
+  ['body']
+)
+
+export const verifyEmailValidator = checkSchema(
+  {
+    email_verify_token: {
+      trim: true,
+      custom: {
+        options: async (value, { req }) => {
+          if (!value) {
+            throw new ErrorWithStatus({
+              message: USERS_MESSAGES.EMAIL_VERIFY_TOKEN_IS_REQUIRED,
+              status: HTTP_STATUS.UNAUTHORIZED
+            })
+          }
+          try {
+            const decoded_email_verify_token = await verifyToken({
+              token: value,
+              secretOrPublicKey: process.env.SIGN_EMAIL_VERIFY_TOKEN_SECRET_KEY as string
+            })
+            console.log('decode', decoded_email_verify_token)
+            ;(req as Request).decoded_email_verify_token = decoded_email_verify_token
+          } catch (error) {
+            throw new ErrorWithStatus({
+              message: (error as JsonWebTokenError).message,
+              status: HTTP_STATUS.UNAUTHORIZED
+            })
+          }
         }
       }
     }
