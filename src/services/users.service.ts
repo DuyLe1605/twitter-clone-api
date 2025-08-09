@@ -85,10 +85,13 @@ class UsersService {
       databaseService.users.updateOne(
         { _id: new ObjectId(user_id) },
         {
+          $currentDate: {
+            updated_at: true
+          },
           $set: {
             email_verify_token: '',
-            verify: UserVerifyStatus.Verified,
-            updated_at: new Date()
+            verify: UserVerifyStatus.Verified
+            // updated_at: new Date()
           }
         }
       )
