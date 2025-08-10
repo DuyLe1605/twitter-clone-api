@@ -216,6 +216,7 @@ export const verifyEmailValidator = checkSchema(
       trim: true,
       custom: {
         options: async (value, { req }) => {
+          console.log('verifyEmailValidator', value)
           if (!value) {
             throw new ErrorWithStatus({
               message: USERS_MESSAGES.EMAIL_VERIFY_TOKEN_IS_REQUIRED,

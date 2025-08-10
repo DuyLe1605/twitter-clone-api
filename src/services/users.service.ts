@@ -104,6 +104,28 @@ class UsersService {
     }
   }
 
+  async resendVerifyEmail(user_id: string) {
+    const email_verify_token = await this.signEmailVerifyToken({ user_id })
+    console.log('email_verify_token', email_verify_token)
+    const result = await databaseService.users.updateOne(
+      { _id: new ObjectId(user_id) },
+      {
+        $currentDate: {
+          updated_at: true
+        },
+        $set: {
+          email_verify_token: email_verify_token,
+          verify: UserVerifyStatus.Verified
+          // updated_at: new Date()
+        }
+      }
+    )
+
+    console.log(result)
+
+    return result
+  }
+
   // Token
   private signAccessToken({ user_id }: { user_id: string }) {
     return signToken({
