@@ -3,7 +3,13 @@ import { ObjectId } from 'mongodb'
 import { HTTP_STATUS } from '~/constants/httpStatus'
 import { USERS_MESSAGES } from '~/constants/messages'
 
-import { LogoutReqBody, RefreshTokenReqBody, TokenPayload, UserReqBody } from '~/models/requests/User.request'
+import {
+  LogoutReqBody,
+  RefreshTokenReqBody,
+  ResetPasswordReqBody,
+  TokenPayload,
+  UserReqBody
+} from '~/models/requests/User.request'
 import User from '~/models/schemas/User.schema'
 import databaseService from '~/services/database.service'
 import usersService from '~/services/users.service'
@@ -111,5 +117,15 @@ export const forgotPasswordController = async (req: Request, res: Response) => {
 }
 export const verifyForgotPasswordController = async (req: Request, res: Response) => {
   res.status(200).json({ message: USERS_MESSAGES.VERIFY_FORGOT_PASSWORD_SUCCESS })
+  return
+}
+
+export const resetPasswordController = async (req: Request, res: Response) => {
+  const { user_id } = req.decoded_forgot_password_token as TokenPayload
+  const { confirm_password } = req.body as ResetPasswordReqBody
+
+  const result = await usersService.resetPassword({ new_password: confirm_password, user_id })
+
+  res.status(200).json(result)
   return
 }
