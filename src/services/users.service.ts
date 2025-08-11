@@ -126,6 +126,27 @@ class UsersService {
     return result
   }
 
+  async forgotPassword(user_id: string) {
+    const forgot_password_token = await this.signForgotPasswordToken({ user_id })
+    console.log('forgot_password_token', forgot_password_token)
+
+    const result = await databaseService.users.updateOne(
+      { _id: new ObjectId(user_id) },
+      {
+        $currentDate: {
+          updated_at: true
+        },
+        $set: {
+          forgot_password_token
+        }
+      }
+    )
+
+    console.log('forgot password result: ', result)
+
+    return { message: USERS_MESSAGES.CHECK_EMAIL_TO_RESET_PASSWORD }
+  }
+
   // Token
   private signAccessToken({ user_id }: { user_id: string }) {
     return signToken({
@@ -156,8 +177,15 @@ class UsersService {
   private signEmailVerifyToken({ user_id }: { user_id: string }) {
     return signToken({
       privateKey: process.env.SIGN_EMAIL_VERIFY_TOKEN_SECRET_KEY as string,
-      payload: { user_id, token_type: TokenType.AccessToken },
-      options: { algorithm: 'HS256', expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN as StringValue }
+      payload: { user_id, token_type: TokenType.EmailVerifyToken },
+      options: { algorithm: 'HS256', expiresIn: process.env.EMAIL_VERIFY_TOKEN_EXPIRES_IN as StringValue }
+    })
+  }
+  private signForgotPasswordToken({ user_id }: { user_id: string }) {
+    return signToken({
+      privateKey: process.env.SIGN_FORGOT_PASSWORD_TOKEN_SECRET_KEY as string,
+      payload: { user_id, token_type: TokenType.ForgotPasswordToken },
+      options: { algorithm: 'HS256', expiresIn: process.env.FORGOT_PASSWORD_TOKEN_EXPIRES_IN as StringValue }
     })
   }
 }

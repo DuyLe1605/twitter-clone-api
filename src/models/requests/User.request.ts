@@ -17,6 +17,10 @@ export interface RefreshTokenReqBody {
   refresh_token: string
 }
 
+export interface ForgotPasswordReqBody {
+  email: string
+}
+
 export interface TokenPayload extends JwtPayload {
   token_type: TokenType
   user_id: string

@@ -242,3 +242,26 @@ export const verifyEmailValidator = checkSchema(
   },
   ['body']
 )
+
+export const forgotPasswordValidator = checkSchema(
+  {
+    email: {
+      trim: true,
+      notEmpty: { errorMessage: USERS_MESSAGES.EMAIL_IS_REQUIRED },
+      isEmail: { errorMessage: USERS_MESSAGES.EMAIL_IS_INVALID },
+      custom: {
+        options: async (value, { req }) => {
+          console.log('check')
+          const user = await databaseService.users.findOne({ email: value })
+          // Nếu không tìm thầy email trong data base thì trả về lỗi
+
+          if (!user) throw new Error('Email không tồn tại, vui lòng kiểm tra lại')
+
+          req.user = user
+          return true
+        }
+      }
+    }
+  },
+  ['body']
+)
