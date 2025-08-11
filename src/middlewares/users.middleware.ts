@@ -10,6 +10,7 @@ import 'dotenv/config'
 import { capitalize } from 'lodash'
 import { JsonWebTokenError } from 'jsonwebtoken'
 import { Request } from 'express'
+import { ObjectId } from 'mongodb'
 
 export const registerValidator = checkSchema(
   {
@@ -265,3 +266,47 @@ export const forgotPasswordValidator = checkSchema(
   },
   ['body']
 )
+
+export const verifyForgotPasswordTokenValidator = checkSchema({
+  forgot_password_token: {
+    trim: true,
+    custom: {
+      options: async (value, { req }) => {
+        if (!value)
+          throw new ErrorWithStatus({
+            message: USERS_MESSAGES.FORGOT_PASSWORD_TOKEN_IS_REQUIRED,
+            status: HTTP_STATUS.UNAUTHORIZED
+          })
+
+        try {
+          const decoded_forgot_password_token = await verifyToken({
+            token: value,
+            secretOrPublicKey: process.env.SIGN_FORGOT_PASSWORD_TOKEN_SECRET_KEY as string
+          })
+          console.log('decode', decoded_forgot_password_token)
+          const { user_id } = decoded_forgot_password_token
+
+          const user = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
+
+          if (user === null) {
+            throw new ErrorWithStatus({ status: HTTP_STATUS.UNAUTHORIZED, message: USERS_MESSAGES.USER_NOT_FOUND })
+          }
+          if (user.forgot_password_token !== value) {
+            throw new ErrorWithStatus({
+              status: HTTP_STATUS.UNAUTHORIZED,
+              message: USERS_MESSAGES.INVALID_FORGOT_PASSWORD_TOKEN
+            })
+          }
+        } catch (error) {
+          throw new ErrorWithStatus({
+            message: (error as JsonWebTokenError).message,
+            status: HTTP_STATUS.UNAUTHORIZED
+          })
+        }
+
+        // IF passed the validator
+        return true
+      }
+    }
+  }
+})

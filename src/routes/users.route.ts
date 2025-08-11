@@ -6,7 +6,8 @@ import {
   refreshTokenController,
   registerController,
   resendVerifyEmailController,
-  verifyEmailController
+  verifyEmailController,
+  verifyForgotPasswordController
 } from '~/controllers/users.controller'
 import {
   accessTokenValidator,
@@ -14,7 +15,8 @@ import {
   loginValidator,
   refreshTokenValidator,
   registerValidator,
-  verifyEmailValidator
+  verifyEmailValidator,
+  verifyForgotPasswordTokenValidator
 } from '~/middlewares/users.middleware'
 import { wrapRequestHandler } from '~/utils/handlers'
 import validate from '~/utils/validation'
@@ -47,5 +49,11 @@ usersRouter.post(
 )
 
 usersRouter.post('/forgot-password', validate(forgotPasswordValidator), wrapRequestHandler(forgotPasswordController))
+
+usersRouter.post(
+  '/verify-forgot-password',
+  validate(verifyForgotPasswordTokenValidator),
+  wrapRequestHandler(verifyForgotPasswordController)
+)
 
 export default usersRouter

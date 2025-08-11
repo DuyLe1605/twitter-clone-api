@@ -2,6 +2,7 @@ import { Response, Request } from 'express'
 import { ObjectId } from 'mongodb'
 import { HTTP_STATUS } from '~/constants/httpStatus'
 import { USERS_MESSAGES } from '~/constants/messages'
+
 import { LogoutReqBody, RefreshTokenReqBody, TokenPayload, UserReqBody } from '~/models/requests/User.request'
 import User from '~/models/schemas/User.schema'
 import databaseService from '~/services/database.service'
@@ -51,6 +52,7 @@ export const refreshTokenController = async (req: Request, res: Response) => {
     refresh_token: result.refresh_token,
     access_token: result.access_token
   })
+  return
 }
 
 export const verifyEmailController = async (req: Request, res: Response) => {
@@ -65,6 +67,7 @@ export const verifyEmailController = async (req: Request, res: Response) => {
 
   if (user.email_verify_token === '') {
     res.status(200).json({ message: USERS_MESSAGES.EMAIL_ALREADY_VERIFIED_BEFORE })
+    return
   }
 
   const result = await usersService.verifyEmail(user_id)
@@ -73,6 +76,7 @@ export const verifyEmailController = async (req: Request, res: Response) => {
     message: USERS_MESSAGES.EMAIL_VERIFY_SUCCESS,
     result
   })
+  return
 }
 
 export const resendVerifyEmailController = async (req: Request, res: Response) => {
@@ -87,6 +91,7 @@ export const resendVerifyEmailController = async (req: Request, res: Response) =
 
   if (user.email_verify_token === '') {
     res.status(200).json({ message: USERS_MESSAGES.EMAIL_ALREADY_VERIFIED_BEFORE })
+    return
   }
 
   const result = await usersService.resendVerifyEmail(user_id)
@@ -95,10 +100,16 @@ export const resendVerifyEmailController = async (req: Request, res: Response) =
     message: USERS_MESSAGES.RESEND_EMAIL_VERIFY_TOKEN_SUCCESS,
     result
   })
+  return
 }
 
 export const forgotPasswordController = async (req: Request, res: Response) => {
   const { _id } = req.user as User
   const result = await usersService.forgotPassword((_id as ObjectId).toString())
   res.status(200).json(result)
+  return
+}
+export const verifyForgotPasswordController = async (req: Request, res: Response) => {
+  res.status(200).json({ message: USERS_MESSAGES.VERIFY_FORGOT_PASSWORD_SUCCESS })
+  return
 }
