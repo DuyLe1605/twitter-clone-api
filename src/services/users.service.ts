@@ -147,7 +147,7 @@ class UsersService {
     return { message: USERS_MESSAGES.CHECK_EMAIL_TO_RESET_PASSWORD }
   }
   async resetPassword({ user_id, new_password }: { user_id: string; new_password: string }) {
-    const result = await databaseService.users.updateOne(
+    await databaseService.users.updateOne(
       {
         _id: new ObjectId(user_id)
       },
@@ -163,6 +163,10 @@ class UsersService {
     )
 
     return { message: USERS_MESSAGES.RESET_PASSWORD_SUCCESS }
+  }
+  async getProfile(user_id: string) {
+    const result = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
+    return result
   }
 
   // Token
