@@ -1,0 +1,102 @@
+{
+  $jsonSchema: {
+    title: 'User Schema Validation',
+    bsonType: 'object',
+    required: [
+      '_id',
+      'name',
+      'email',
+      'date_of_birth',
+      'password',
+      'email_verify_token',
+      'forgot_password_token',
+      'verify',
+      'bio',
+      'location',
+      'website',
+      'username',
+      'avatar',
+      'cover_photo',
+      'created_at',
+      'updated_at'
+    ],
+    properties: {
+      _id: {
+        bsonType: 'objectId',
+        description: 'ID duy nhất của người dùng, bắt buộc và kiểu ObjectId'
+      },
+      name: {
+        bsonType: 'string',
+        description: 'Tên người dùng, bắt buộc và phải là chuỗi ký tự'
+      },
+      email: {
+        bsonType: 'string',
+        pattern: '^.+@.+\\..+$',
+        description: 'Địa chỉ email hợp lệ, bắt buộc và là chuỗi ký tự'
+      },
+      date_of_birth: {
+        bsonType: 'date',
+        description: 'Ngày sinh của người dùng, bắt buộc và kiểu date'
+      },
+      password: {
+        bsonType: 'string',
+        minLength: 6,
+        description: 'Mật khẩu người dùng, bắt buộc, ít nhất 6 ký tự'
+      },
+      email_verify_token: {
+        bsonType: [
+          'string',
+          'null'
+        ],
+        description: 'Token dùng để xác nhận email, có thể là chuỗi hoặc null, bắt buộc phải có trường này'
+      },
+      forgot_password_token: {
+        bsonType: [
+          'string',
+          'null'
+        ],
+        description: 'Token dùng để reset mật khẩu, có thể là chuỗi hoặc null, bắt buộc phải có trường này'
+      },
+      verify: {
+        'enum': [
+          'unverified',
+          'verified',
+          'suspended'
+        ],
+        description: 'Trạng thái xác thực tài khoản, bắt buộc và chỉ nhận một trong các giá trị: unverified, verified, suspended'
+      },
+      bio: {
+        bsonType: 'string',
+        description: 'Tiểu sử người dùng, bắt buộc và là chuỗi ký tự'
+      },
+      location: {
+        bsonType: 'string',
+        description: 'Địa điểm người dùng, bắt buộc và là chuỗi ký tự'
+      },
+      website: {
+        bsonType: 'string',
+        description: 'Đường dẫn website cá nhân, bắt buộc và là chuỗi ký tự'
+      },
+      username: {
+        bsonType: 'string',
+        description: 'Tên đăng nhập của người dùng, bắt buộc và là chuỗi ký tự'
+      },
+      avatar: {
+        bsonType: 'string',
+        description: 'URL ảnh đại diện người dùng, bắt buộc và là chuỗi ký tự'
+      },
+      cover_photo: {
+        bsonType: 'string',
+        description: 'URL ảnh bìa của người dùng, bắt buộc và là chuỗi ký tự'
+      },
+      created_at: {
+        bsonType: 'date',
+        description: 'Ngày tạo hồ sơ người dùng, bắt buộc và kiểu date'
+      },
+      updated_at: {
+        bsonType: 'date',
+        description: 'Ngày cập nhật hồ sơ người dùng, bắt buộc và kiểu date'
+      }
+    }
+  }
+}
