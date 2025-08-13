@@ -1,5 +1,5 @@
 import { TokenType, UserVerifyStatus } from '~/constants/enums'
-import { UserReqBody } from '~/models/requests/User.request'
+import { UpdateUserReqBody, UserReqBody } from '~/models/requests/User.request'
 import User from '~/models/schemas/User.schema'
 import databaseService from '~/services/database.service'
 import { hashPassword } from '~/utils/crypto'
@@ -9,6 +9,7 @@ import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import { ObjectId } from 'mongodb'
 import 'dotenv/config'
 import { USERS_MESSAGES } from '~/constants/messages'
+import { after } from 'lodash'
 
 class UsersService {
   async register(payload: UserReqBody) {
@@ -181,6 +182,21 @@ class UsersService {
   }
   async getProfile(user_id: string) {
     const result = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
+    return result
+  }
+  async updateMe(user_id: string, body: UpdateUserReqBody) {
+    const result = await databaseService.users.findOneAndUpdate(
+      { _id: new ObjectId(user_id) },
+      {
+        $set: {
+          body
+        }
+      },
+      {
+        returnDocument: 'after',
+        projection: { password: 0, email_verify_token: 0, forgot_password_token: 0 }
+      }
+    )
     return result
   }
 

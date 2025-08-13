@@ -19,6 +19,7 @@ import {
   refreshTokenValidator,
   registerValidator,
   resetPasswordValidator,
+  updateMeValidator,
   verifiedUserValidator,
   verifyEmailValidator,
   verifyForgotPasswordTokenValidator
@@ -78,6 +79,12 @@ usersRouter.get('/me', validate(accessTokenValidator), wrapRequestHandler(getMeC
  * Header: { Authorization: Bearer <access_token> }
  * Body: UserSchema
  */
-usersRouter.patch('/me', validate(accessTokenValidator), verifiedUserValidator, wrapRequestHandler(updateMeController))
+usersRouter.patch(
+  '/me',
+  validate(accessTokenValidator),
+  verifiedUserValidator,
+  validate(updateMeValidator),
+  wrapRequestHandler(updateMeController)
+)
 
 export default usersRouter

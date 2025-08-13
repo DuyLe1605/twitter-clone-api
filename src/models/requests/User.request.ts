@@ -8,6 +8,16 @@ export interface UserReqBody {
   confirm_password: string
   date_of_birth: string // Người dùng gửi lên dạng ISO String
 }
+export interface UpdateUserReqBody {
+  name?: string
+  date_of_birth?: string
+  bio?: string
+  location?: string
+  website?: string
+  username?: string
+  avatar?: string
+  cover_photo?: string
+}
 
 export interface LogoutReqBody {
   refresh_token: string
@@ -26,6 +36,7 @@ export interface ResetPasswordReqBody {
   confirm_password: string
   forgot_password_token: string
 }
+
 export interface TokenPayload extends JwtPayload {
   token_type: TokenType
   user_id: string
