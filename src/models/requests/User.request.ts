@@ -8,7 +8,7 @@ export interface UserReqBody {
   confirm_password: string
   date_of_birth: string // Người dùng gửi lên dạng ISO String
 }
-export interface UpdateUserReqBody {
+export interface UpdateMeReqBody {
   name?: string
   date_of_birth?: string
   bio?: string

@@ -1,5 +1,5 @@
 import { TokenType, UserVerifyStatus } from '~/constants/enums'
-import { UpdateUserReqBody, UserReqBody } from '~/models/requests/User.request'
+import { UpdateMeReqBody, UserReqBody } from '~/models/requests/User.request'
 import User from '~/models/schemas/User.schema'
 import databaseService from '~/services/database.service'
 import { hashPassword } from '~/utils/crypto'
@@ -184,7 +184,7 @@ class UsersService {
     const result = await databaseService.users.findOne({ _id: new ObjectId(user_id) })
     return result
   }
-  async updateMe(user_id: string, body: UpdateUserReqBody) {
+  async updateMe(user_id: string, body: UpdateMeReqBody) {
     const result = await databaseService.users.findOneAndUpdate(
       { _id: new ObjectId(user_id) },
       {

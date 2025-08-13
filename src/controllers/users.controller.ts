@@ -8,7 +8,6 @@ import {
   RefreshTokenReqBody,
   ResetPasswordReqBody,
   TokenPayload,
-  UpdateUserReqBody,
   UserReqBody
 } from '~/models/requests/User.request'
 import User from '~/models/schemas/User.schema'
