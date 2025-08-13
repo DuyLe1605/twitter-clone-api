@@ -1,4 +1,4 @@
-import { check, checkSchema } from 'express-validator'
+import { checkSchema } from 'express-validator'
 import { HTTP_STATUS } from '~/constants/httpStatus'
 import { USERS_MESSAGES } from '~/constants/messages'
 import { ErrorWithStatus } from '~/models/Errors'
@@ -9,8 +9,10 @@ import { verifyToken } from '~/utils/jwt'
 import 'dotenv/config'
 import { capitalize } from 'lodash'
 import { JsonWebTokenError } from 'jsonwebtoken'
-import { Request } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import { ObjectId } from 'mongodb'
+import { TokenPayload } from '~/models/requests/User.request'
+import { UserVerifyStatus } from '~/constants/enums'
 
 export const registerValidator = checkSchema(
   {
@@ -400,3 +402,13 @@ export const resetPasswordValidator = checkSchema(
   },
   ['body']
 )
+
+export const verifiedUserValidator = (req: Request, res: Response, next: NextFunction) => {
+  const { verify } = req.decoded_authorization as TokenPayload
+  console.log(verify)
+  if (verify === UserVerifyStatus.Unverified) {
+    next(new ErrorWithStatus({ message: USERS_MESSAGES.USER_NOT_VERIFIED, status: HTTP_STATUS.FORBIDDEN }))
+    return
+  }
+  next()
+}

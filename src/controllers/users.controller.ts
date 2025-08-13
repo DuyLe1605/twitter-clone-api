@@ -30,7 +30,7 @@ export const loginController = async (req: Request, res: Response) => {
   }
   const { _id } = user
 
-  const result = await usersService.login((_id as ObjectId).toString())
+  const result = await usersService.login({ user_id: (_id as ObjectId).toString(), verify: user.verify })
 
   res.json({
     message: USERS_MESSAGES.LOGIN_SUCCESS,
@@ -51,8 +51,8 @@ export const logoutController = async (req: Request, res: Response) => {
 
 export const refreshTokenController = async (req: Request, res: Response) => {
   const { refresh_token } = req.body as RefreshTokenReqBody
-  const { user_id, exp } = req.decoded_refresh_token as TokenPayload
-  const result = await usersService.refreshToken({ refresh_token, exp, user_id })
+  const { user_id, exp, verify } = req.decoded_refresh_token as TokenPayload
+  const result = await usersService.refreshToken({ refresh_token, exp, user_id, verify })
   res.json({
     message: USERS_MESSAGES.REFRESH_TOKEN_SUCCESS,
     refresh_token: result.refresh_token,
@@ -110,8 +110,8 @@ export const resendVerifyEmailController = async (req: Request, res: Response) =
 }
 
 export const forgotPasswordController = async (req: Request, res: Response) => {
-  const { _id } = req.user as User
-  const result = await usersService.forgotPassword((_id as ObjectId).toString())
+  const { _id, verify } = req.user as User
+  const result = await usersService.forgotPassword({ user_id: (_id as ObjectId).toString(), verify })
   res.status(200).json(result)
   return
 }
@@ -138,4 +138,8 @@ export const getMeController = async (req: Request, res: Response) => {
     data: result
   })
   return
+}
+
+export const updateMeController = async (req: Request, res: Response) => {
+  res.json({ message: 'updateMeController OK' })
 }
