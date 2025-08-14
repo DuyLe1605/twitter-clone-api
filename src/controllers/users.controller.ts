@@ -4,6 +4,7 @@ import { HTTP_STATUS } from '~/constants/httpStatus'
 import { USERS_MESSAGES } from '~/constants/messages'
 
 import {
+  FollowReqBody,
   GetProfileReqParams,
   LogoutReqBody,
   RefreshTokenReqBody,
@@ -157,4 +158,15 @@ export const getProfileController = async (req: Request, res: Response) => {
   const user = await usersService.getProfileUser(username)
 
   res.json({ data: user, message: USERS_MESSAGES.GET_PROFILE_SUCCESS })
+}
+
+export const followUserController = async (req: Request, res: Response) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const { followed_user_id } = req.body as FollowReqBody
+
+  const result = await usersService.followUser({ followed_user_id, user_id })
+
+  res.status(200).json({
+    result
+  })
 }

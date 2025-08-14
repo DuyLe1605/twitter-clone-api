@@ -81,5 +81,10 @@ export const USERS_MESSAGES = {
   UPDATE_ME_SUCCESS: 'Cập nhật thông tin cá nhân thành công',
 
   // ====== Lấy hồ sơ người khác ======
-  GET_PROFILE_SUCCESS: 'Lấy hồ sơ người dùng thành công'
+  GET_PROFILE_SUCCESS: 'Lấy hồ sơ người dùng thành công',
+
+  INVALID_USER_ID: 'User Id không hợp lệ',
+  FOLLOW_SUCCESS: 'Theo dõi thành công',
+  USER_ALREADY_FOLLOWED: 'Tài khoản này đã được theo dõi',
+  USER_ID_IS_CURRENT: 'Đây là tài khoản của bạn, không thể follow'
 } as const

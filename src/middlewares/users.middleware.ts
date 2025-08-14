@@ -451,20 +451,27 @@ export const updateMeValidator = checkSchema(
       custom: {
         options: async (value: string, { req }) => {
           if (!REGEX_USERNAME.test(value)) {
-            throw Error(USERS_MESSAGES.USERNAME_INVALID)
+            throw new ErrorWithStatus({
+              message: USERS_MESSAGES.USERNAME_INVALID,
+              status: HTTP_STATUS.BAD_REQUEST // 400
+            })
           }
-          const { user_id } = req.decoded_authorization
 
+          const { user_id } = req.decoded_authorization as TokenPayload
           const user = await databaseService.users.findOne({ username: value })
-          // Nếu đã tồn tại username này trong db
-          // thì chúng ta không cho phép update
 
           if (user) {
             if (user_id === user._id.toString()) {
-              throw Error(USERS_MESSAGES.USERNAME_IS_CURRENT)
+              throw new ErrorWithStatus({
+                message: USERS_MESSAGES.USERNAME_IS_CURRENT,
+                status: HTTP_STATUS.CONFLICT // 409
+              })
             }
 
-            throw Error(USERS_MESSAGES.USERNAME_EXISTED)
+            throw new ErrorWithStatus({
+              message: USERS_MESSAGES.USERNAME_EXISTED,
+              status: HTTP_STATUS.CONFLICT // 409
+            })
           }
         }
       }
@@ -474,3 +481,31 @@ export const updateMeValidator = checkSchema(
   },
   ['body']
 )
+export const followUserValidator = checkSchema({
+  followed_user_id: {
+    custom: {
+      options: async (value: string, { req }) => {
+        const { user_id } = req.decoded_authorization as TokenPayload
+
+        // User ID không hợp lệ (Không đúng kiểu)
+        if (!ObjectId.isValid(value)) {
+          throw new ErrorWithStatus({ message: USERS_MESSAGES.INVALID_USER_ID, status: HTTP_STATUS.BAD_REQUEST })
+        }
+
+        // Trường hợp followed_id trùng với user_id
+        if (user_id === value) {
+          throw new ErrorWithStatus({ message: USERS_MESSAGES.USER_ID_IS_CURRENT, status: HTTP_STATUS.CONFLICT })
+        }
+
+        const followed_user = await databaseService.users.findOne({ _id: new ObjectId(value) })
+
+        // Không tìm thấy người dùng
+        if (!followed_user) {
+          throw new ErrorWithStatus({ message: USERS_MESSAGES.USER_NOT_FOUND, status: HTTP_STATUS.NOT_FOUND })
+        }
+
+        return true
+      }
+    }
+  }
+})

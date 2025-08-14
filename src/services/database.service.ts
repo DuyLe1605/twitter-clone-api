@@ -2,6 +2,7 @@ import { Collection, Db, MongoClient, ServerApiVersion } from 'mongodb'
 import 'dotenv/config'
 import { UserInterface } from '~/models/schemas/User.schema'
 import { RefreshTokenInterface } from '~/models/schemas/RefreshToken.schema'
+import { FollowerInterface } from '~/models/schemas/Follower.schema'
 
 const uri = process.env.DB_URI as string
 
@@ -40,6 +41,9 @@ class DatabaseService {
   }
   get refreshTokens(): Collection<RefreshTokenInterface> {
     return this.db.collection(process.env.DB_REFRESH_TOKENS_COLLECTION as string)
+  }
+  get followers(): Collection<FollowerInterface> {
+    return this.db.collection(process.env.DB_FOLLOWERS_COLLECTION as string)
   }
 }
 

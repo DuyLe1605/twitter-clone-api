@@ -9,9 +9,11 @@ import RefreshToken from '~/models/schemas/RefreshToken.schema'
 import { ObjectId } from 'mongodb'
 import 'dotenv/config'
 import { USERS_MESSAGES } from '~/constants/messages'
-import { after } from 'lodash'
+
 import { ErrorWithStatus } from '~/models/Errors'
 import { HTTP_STATUS } from '~/constants/httpStatus'
+import Follower from '~/models/schemas/Follower.schema'
+import Follow from '~/models/schemas/Follower.schema'
 
 class UsersService {
   async register(payload: UserReqBody) {
@@ -225,6 +227,24 @@ class UsersService {
     }
 
     return result
+  }
+
+  async followUser({ user_id, followed_user_id }: { user_id: string; followed_user_id: string }) {
+    const follow = await databaseService.followers.findOne({
+      user_id: new ObjectId(user_id),
+      followed_user_id: new ObjectId(followed_user_id)
+    })
+
+    if (follow === null) {
+      // Trường hợp chưa follow thì tạo mới follow trong database
+      await databaseService.followers.insertOne(
+        new Follow({ user_id: new ObjectId(user_id), followed_user_id: new ObjectId(followed_user_id) })
+      )
+      return { message: USERS_MESSAGES.FOLLOW_SUCCESS }
+    }
+
+    // Trường hợp đã follow rồi
+    return { message: USERS_MESSAGES.USER_ALREADY_FOLLOWED }
   }
 
   // Token

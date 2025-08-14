@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import {
+  followUserController,
   forgotPasswordController,
   getMeController,
   getProfileController,
@@ -16,6 +17,7 @@ import {
 import { filterMiddleware } from '~/middlewares/common.middleware'
 import {
   accessTokenValidator,
+  followUserValidator,
   forgotPasswordValidator,
   loginValidator,
   refreshTokenValidator,
@@ -101,5 +103,12 @@ usersRouter.patch(
 )
 
 usersRouter.get('/:username', validate(accessTokenValidator), wrapRequestHandler(getProfileController))
+
+usersRouter.post(
+  '/follow',
+  validate(accessTokenValidator),
+  validate(followUserValidator),
+  wrapRequestHandler(followUserController)
+)
 
 export default usersRouter
