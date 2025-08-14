@@ -4,6 +4,7 @@ import { HTTP_STATUS } from '~/constants/httpStatus'
 import { USERS_MESSAGES } from '~/constants/messages'
 
 import {
+  GetProfileReqParams,
   LogoutReqBody,
   RefreshTokenReqBody,
   ResetPasswordReqBody,
@@ -132,9 +133,9 @@ export const resetPasswordController = async (req: Request, res: Response) => {
 
 export const getMeController = async (req: Request, res: Response) => {
   const { user_id } = req.decoded_authorization as TokenPayload
-  const result = await usersService.getProfile(user_id)
+  const result = await usersService.getMe(user_id)
   res.status(200).json({
-    message: USERS_MESSAGES.GET_PROFILE_SUCCESS,
+    message: USERS_MESSAGES.GET_ME_SUCCESS,
     data: result
   })
   return
@@ -149,4 +150,11 @@ export const updateMeController = async (req: Request, res: Response) => {
     data: result
   })
   return
+}
+
+export const getProfileController = async (req: Request, res: Response) => {
+  const { username } = req.params
+  const user = await usersService.getProfileUser(username)
+
+  res.json({ data: user, message: USERS_MESSAGES.GET_PROFILE_SUCCESS })
 }

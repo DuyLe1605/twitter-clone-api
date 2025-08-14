@@ -37,6 +37,9 @@ export interface ResetPasswordReqBody {
   forgot_password_token: string
 }
 
+export interface GetProfileReqParams {
+  username: string
+}
 export interface TokenPayload extends JwtPayload {
   token_type: TokenType
   user_id: string

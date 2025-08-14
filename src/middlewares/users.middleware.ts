@@ -13,6 +13,7 @@ import { NextFunction, Request, Response } from 'express'
 import { ObjectId } from 'mongodb'
 import { TokenPayload } from '~/models/requests/User.request'
 import { UserVerifyStatus } from '~/constants/enums'
+import { REGEX_USERNAME } from '~/constants/regex'
 
 const passwordSchema: ParamSchema = {
   notEmpty: { errorMessage: USERS_MESSAGES.PASSWORD_IS_REQUIRED },
@@ -447,12 +448,25 @@ export const updateMeValidator = checkSchema(
       },
       trim: true,
 
-      isLength: {
-        options: {
-          min: 1,
-          max: 50
-        },
-        errorMessage: USERS_MESSAGES.USERNAME_LENGTH
+      custom: {
+        options: async (value: string, { req }) => {
+          if (!REGEX_USERNAME.test(value)) {
+            throw Error(USERS_MESSAGES.USERNAME_INVALID)
+          }
+          const { user_id } = req.decoded_authorization
+
+          const user = await databaseService.users.findOne({ username: value })
+          // Nếu đã tồn tại username này trong db
+          // thì chúng ta không cho phép update
+
+          if (user) {
+            if (user_id === user._id.toString()) {
+              throw Error(USERS_MESSAGES.USERNAME_IS_CURRENT)
+            }
+
+            throw Error(USERS_MESSAGES.USERNAME_EXISTED)
+          }
+        }
       }
     },
     avatar: imageSchema,
