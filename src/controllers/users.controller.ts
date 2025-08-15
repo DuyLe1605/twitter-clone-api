@@ -4,8 +4,8 @@ import { HTTP_STATUS } from '~/constants/httpStatus'
 import { USERS_MESSAGES } from '~/constants/messages'
 
 import {
+  ChangePasswordReqBody,
   FollowReqBody,
-  GetProfileReqParams,
   LogoutReqBody,
   RefreshTokenReqBody,
   ResetPasswordReqBody,
@@ -168,11 +168,21 @@ export const followUserController = async (req: Request, res: Response) => {
 
   res.status(200).json(result)
 }
+
 export const unFollowUserController = async (req: Request, res: Response) => {
   const { user_id } = req.decoded_authorization as TokenPayload
   const { user_id: followed_user_id } = req.params
 
   const result = await usersService.unFollowUser({ followed_user_id, user_id })
+
+  res.status(200).json(result)
+}
+
+export const changePasswordController = async (req: Request, res: Response) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const { new_password } = req.body as ChangePasswordReqBody
+
+  const result = await usersService.changePassword({ new_password, user_id })
 
   res.status(200).json(result)
 }

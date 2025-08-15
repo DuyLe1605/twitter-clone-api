@@ -12,7 +12,7 @@ import { USERS_MESSAGES } from '~/constants/messages'
 
 import { ErrorWithStatus } from '~/models/Errors'
 import { HTTP_STATUS } from '~/constants/httpStatus'
-import Follower from '~/models/schemas/Follower.schema'
+
 import Follow from '~/models/schemas/Follower.schema'
 
 class UsersService {
@@ -264,6 +264,20 @@ class UsersService {
       followed_user_id: new ObjectId(followed_user_id)
     })
     return { message: USERS_MESSAGES.UNFOLLOW_SUCCESS }
+  }
+  async changePassword({ user_id, new_password }: { user_id: string; new_password: string }) {
+    await databaseService.users.findOneAndUpdate(
+      { _id: new ObjectId(user_id) },
+      {
+        $currentDate: {
+          updated_at: true
+        },
+        $set: {
+          password: hashPassword(new_password)
+        }
+      }
+    )
+    return { message: USERS_MESSAGES.CHANGE_PASSWORD_SUCCESS }
   }
 
   // Token

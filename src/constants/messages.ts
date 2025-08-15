@@ -89,5 +89,7 @@ export const USERS_MESSAGES = {
   USER_ID_IS_CURRENT: 'Đây là ID tài khoản của bạn, không thể thực hiện hành động !',
 
   ALREADY_UNFOLLOWED: 'Already unfollowed',
-  UNFOLLOW_SUCCESS: 'Unfollow success'
+  UNFOLLOW_SUCCESS: 'Unfollow success',
+  OLD_PASSWORD_NOT_MATCH: 'Old password not match',
+  CHANGE_PASSWORD_SUCCESS: 'Change password success'
 } as const
