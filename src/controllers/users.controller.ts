@@ -166,7 +166,13 @@ export const followUserController = async (req: Request, res: Response) => {
 
   const result = await usersService.followUser({ followed_user_id, user_id })
 
-  res.status(200).json({
-    result
-  })
+  res.status(200).json(result)
+}
+export const unFollowUserController = async (req: Request, res: Response) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const { user_id: followed_user_id } = req.params
+
+  const result = await usersService.unFollowUser({ followed_user_id, user_id })
+
+  res.status(200).json(result)
 }

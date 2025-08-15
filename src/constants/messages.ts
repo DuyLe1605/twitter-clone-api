@@ -86,5 +86,8 @@ export const USERS_MESSAGES = {
   INVALID_USER_ID: 'User Id không hợp lệ',
   FOLLOW_SUCCESS: 'Theo dõi thành công',
   USER_ALREADY_FOLLOWED: 'Tài khoản này đã được theo dõi',
-  USER_ID_IS_CURRENT: 'Đây là tài khoản của bạn, không thể follow'
+  USER_ID_IS_CURRENT: 'Đây là ID tài khoản của bạn, không thể thực hiện hành động !',
+
+  ALREADY_UNFOLLOWED: 'Already unfollowed',
+  UNFOLLOW_SUCCESS: 'Unfollow success'
 } as const

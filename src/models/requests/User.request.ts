@@ -44,6 +44,10 @@ export interface GetProfileReqParams {
 export interface FollowReqBody {
   followed_user_id: string
 }
+
+export interface UnfollowReqParams {
+  user_id: string
+}
 export interface TokenPayload extends JwtPayload {
   token_type: TokenType
   user_id: string

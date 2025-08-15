@@ -87,6 +87,33 @@ const imageSchema: ParamSchema = {
   }
 }
 
+const userIdSchema: ParamSchema = {
+  custom: {
+    options: async (value: string, { req }) => {
+      const { user_id } = req.decoded_authorization as TokenPayload
+
+      // User ID không hợp lệ (Không đúng kiểu)
+      if (!ObjectId.isValid(value)) {
+        throw new ErrorWithStatus({ message: USERS_MESSAGES.INVALID_USER_ID, status: HTTP_STATUS.BAD_REQUEST })
+      }
+
+      // Trường hợp followed_id trùng với user_id
+      if (user_id === value) {
+        throw new ErrorWithStatus({ message: USERS_MESSAGES.USER_ID_IS_CURRENT, status: HTTP_STATUS.CONFLICT })
+      }
+
+      const followed_user = await databaseService.users.findOne({ _id: new ObjectId(value) })
+
+      // Không tìm thấy người dùng
+      if (!followed_user) {
+        throw new ErrorWithStatus({ message: USERS_MESSAGES.USER_NOT_FOUND, status: HTTP_STATUS.NOT_FOUND })
+      }
+
+      return true
+    }
+  }
+}
+
 // Validator
 export const registerValidator = checkSchema(
   {
@@ -481,31 +508,15 @@ export const updateMeValidator = checkSchema(
   },
   ['body']
 )
-export const followUserValidator = checkSchema({
-  followed_user_id: {
-    custom: {
-      options: async (value: string, { req }) => {
-        const { user_id } = req.decoded_authorization as TokenPayload
-
-        // User ID không hợp lệ (Không đúng kiểu)
-        if (!ObjectId.isValid(value)) {
-          throw new ErrorWithStatus({ message: USERS_MESSAGES.INVALID_USER_ID, status: HTTP_STATUS.BAD_REQUEST })
-        }
-
-        // Trường hợp followed_id trùng với user_id
-        if (user_id === value) {
-          throw new ErrorWithStatus({ message: USERS_MESSAGES.USER_ID_IS_CURRENT, status: HTTP_STATUS.CONFLICT })
-        }
-
-        const followed_user = await databaseService.users.findOne({ _id: new ObjectId(value) })
-
-        // Không tìm thấy người dùng
-        if (!followed_user) {
-          throw new ErrorWithStatus({ message: USERS_MESSAGES.USER_NOT_FOUND, status: HTTP_STATUS.NOT_FOUND })
-        }
-
-        return true
-      }
-    }
-  }
-})
+export const followUserValidator = checkSchema(
+  {
+    followed_user_id: userIdSchema
+  },
+  ['body']
+)
+export const unFollowUserValidator = checkSchema(
+  {
+    user_id: userIdSchema
+  },
+  ['params']
+)
